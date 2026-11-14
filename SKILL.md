@@ -1,29 +1,21 @@
 ---
 name: video-inspector
 description: >-
-  Comprehensive video quality inspection, technical auditing, and visual fidelity QA skill.
-  Audits MP4/WebM videos and HTML5 Canvas renders for:
-  1. Technical stream encoding & EBU R128 loudness compliance (-18 LUFS / -14 LUFS, True Peak <= -1.0 dBTP),
-  2. Character anatomical naturalness & movement ergonomics (1:6.5 build, trapezius slope),
-  3. Scene object semantic fidelity (avoiding crude primitive placeholders, ensuring organic textures),
-  4. Light-to-emitter alignment & beam coincidence,
-  5. Hand-Socket & Prop Grip Alignment QA (bag, milk carton, mop 2-hand grip <= 2–3px offset, Z-index occlusion),
-  6. 2-Segment FK Walk & Foot-Planting Audit (knee angle >= 0 swing, 0px floor clipping, sole plane alignment, anti-moonwalk sync),
-  7. Macro POV Hand & Progressive Masking QA (ctx.clip() mask synchronization, zero ghosting/pre-render lines),
-  8. HUD Typography & Thai Overflow Check (Thai vowel & tone mark clearance: กฎ/ที่/น้ำพุ/ฟู้ดคอร์ท, card padding >= 12px, WCAG contrast ratio),
-  9. 9:16 Shorts / TikTok UI Safe Zone Mask (right 140px, bottom 320px, top 180px dead zones, contact sheet visual overlay),
-  and generates annotated visual keyframe contact sheet reports.
+  Use when auditing, inspecting, or running technical and visual QA on rendered MP4/WebM
+  videos, 9:16 vertical Shorts, or 2.5D HTML5 Canvas animation codebases (`core.js`,
+  `views.js`) for EBU R128 loudness, black frames, character kinematics, hand-socket grip,
+  progressive masking, Thai HUD typography, or TikTok/Shorts UI Safe Zones.
 ---
 
 # Video Quality Inspector & Technical QA Skill
 
-This skill provides an automated, rigorous quality assurance (QA) pipeline to audit, verify, and diagnose video production deliverables for both **16:9 Long-Form Masters** and **9:16 Vertical Shorts/Reels/TikTok Episodes**.
+This skill provides an automated, 16-point quality assurance (QA) pipeline to audit, verify, and diagnose video production deliverables for both **16:9 Long-Form Masters** and **9:16 Vertical Shorts/Reels/TikTok Episodes (`<= 60.0s`)**.
 
 ---
 
 ## 1. Quality Assurance Dimensions
 
-When inspecting any video render or source codebase, evaluate across 12 core QA pillars:
+When inspecting any video render or source codebase, evaluate across 12 core QA sections (producing the 16-point final scorecard):
 
 ### 1.1 Technical Encoding & Container Specs
 - **Resolution & Aspect Ratio:**
@@ -61,16 +53,15 @@ When inspecting any video render or source codebase, evaluate across 12 core QA 
 
 ### 1.5 Audio & Broadcast Loudness Standards (EBU R128)
 - **Target Integrated Loudness:**
-  - YouTube Master: `-14.0 LUFS` to `-18.0 LUFS` (standard: `-18.0 LUFS`).
+  - 16:9 Long-Form Master: `-18.0 LUFS` ($\pm 2.5\text{ LU}$ tolerance).
+  - 9:16 Vertical Shorts: `-14.0 LUFS` to `-18.0 LUFS` (accepted window: `-12.5` to `-19.5 LUFS`).
   - Maximum True Peak (`TP`): $\le -1.0\text{ dBTP}$ (prevents clipping during AAC transcoding).
   - Loudness Range (`LRA`): $\le 7.0\text{ LU}$ (maintains vocal clarity over ambience).
 - **Audio Codec & Bitrate:** Stereo or Mono `AAC` at $\ge 192\text{ kbps}$ or uncompressed PCM (`44.1 kHz` or `48 kHz`).
-- **Audio-Video Duration Sync:** Audio and video duration must match within $< 0.05\text{s}$.
 
 ### 1.6 Visual Frame Integrity & Motion QA
-- **Black Frame Detection:** Flag any unintended pure-black frames (`blackdetect=d=0.2:pix_th=0.10`).
-- **Frozen Frame Detection:** Flag static/dropped frames during active scenes (`freezedetect=n=0.003:d=1.5`).
-- **Aspect Ratio Distortion:** Ensure graphics and character rigs maintain proportions.
+- **Black Frame Detection:** Flag any unintended pure-black intervals (`blackdetect=d=0.25:pix_th=0.10`).
+- **Aspect Ratio & Frame Integrity:** Ensure graphics and character rigs maintain proportions without dropped streams.
 
 ### 1.7 Content, Subtitle & HUD Safe-Zones (Standard 16:9)
 - **Burned-In Subtitles:**
@@ -176,46 +167,53 @@ When inspecting any video render or source codebase, evaluate across 12 core QA 
   3. **การวางตำแหน่ง Subtitles & HUD Cards ใน 9:16:**
      - ซับไตเติลภาษาไทย: ต้องวางอยู่ที่พิกัด $Y \le 1600\text{px}$ (เช่น $Y = 1520\text{px}$ หรือ $Y = 1450\text{px}$) **ห้ามใช้สูตร $H - 46$ ($1874\text{px}$) ของ 16:9 เดิมเด็ดขาด!**
      - การ์ดกฎและ HUD: ต้องมีความกว้าง $W \le 900\text{px}$ และจัดวางกึ่งกลางหน้าจอ ($X = 540\text{px}$) หลบขอบขวา $140\text{px}$
-  4. **Contact Sheet Visual Dead Zone Overlay:**
+  4. **Strict `<= 60.0s` Shorts Duration Limit:**
+     - คลิป 9:16 Shorts ทุกตอน (`EP 1..N`) ต้องมีความยาวไม่เกิน **$60.0\text{ วินาที}$** (แนะนำตั้ง `maxSec = 58s` ใน `shorts_planner.js` เพื่อให้แบ่งเป็น `EP 6`, `EP 7`, `EP 8+` อัตโนมัติเมื่อเนื้อหายาว)
+  5. **Contact Sheet Visual Dead Zone Overlay:**
      - สคริปต์ตรวจสอบต้องวาดกรอบสีแดงโปร่งแสง (`rgba(239, 68, 68, 0.28)`) พร้อมเส้นขอบสีแดงเตือนภัยทับบนเฟรมตัวอย่างของ Contact Sheet เพื่อเป็นหลักฐานตรวจสอบด้วยสายตา (Proof-of-Work)
 
 ---
 
 ## 2. Automated Programmatic Inspection Script
 
-รันสคริปต์ตรวจสอบผ่านคำสั่ง:
+รันสคริปต์ตรวจสอบผ่านคำสั่ง (รองรับทั้งการรันในโฟลเดอร์โปรเจกต์ หรือเรียกจากโฟลเดอร์สกิล):
 ```bash
-node inspect_video.js <path-to-video.mp4> [--shorts]
+node inspect_video.js <path-to-video.mp4> [--shorts] [--strict] [--allow-over-60]
+# หรือเรียกผ่านโฟลเดอร์สกิลโดยตรง:
+node ~/.gemini/config/skills/video-inspector/scripts/inspect_video.js <path-to-video.mp4> [--shorts] [--strict]
 ```
 
 ### การทำงานของสคริปต์:
-1. **Stream & Loudness Analysis:** ตรวจสอบความละเอียด, FPS deterministic, Codec, EBU R128 loudness (`-18.0 LUFS`), True Peak ($\le -1.0\text{ dBTP}$), และค้นหา Black frames
+1. **Stream & Loudness Analysis:** ตรวจสอบความละเอียด, FPS deterministic (`24`/`30` FPS), Codec (`yuv420p`), EBU R128 loudness (`-18.0 LUFS` สำหรับ 16:9 / `-14.0..-18.0 LUFS` สำหรับ Shorts), True Peak ($\le -1.0\text{ dBTP}$), และค้นหา Black intervals (`blackdetect=d=0.25:pix_th=0.10`)
 2. **Code AST & Rig Verification:** ค้นหาและวิเคราะห์โค้ดต้นทาง (`core.js` และ `views.js`) ในโฟลเดอร์ของวิดีโอ เพื่อตรวจสอบ:
-   - จุดยึดมือและวัตถุ (`carry_bag`, `crouch_hold_item`, `two_hand_mop`, Z-index)
+   - จุดยึดมือและวัตถุ (`carry_bag`, `crouch_hold_item`, `drawEntity`/`drawJanitor` mop Z-index)
    - ท่าเดิน 2 ท่อน (`kneeAngle >= 0`, floor clipping, shadow contact, anti-moonwalk)
    - Progressive Masking (`ctx.clip()` mask-to-tip sync, zero ghosting)
-   - HUD typography (ความสูง Badge, padding $\ge 12\text{px}$, WCAG contrast ratio)
-   - Vertical Safe Zone (ระยะห่างซับไตเติลและการ์ดในคลิป 9:16)
+   - HUD typography (ความสูง Badge $\ge 24\text{px}$, padding $\ge 12\text{px}$, WCAG contrast ratio)
+   - Vertical Safe Zone & Duration (ระยะห่างซับไตเติลและการ์ดในคลิป 9:16 และความยาว `<= 60.0s`)
 3. **Keyframe Contact Sheet พร้อม Dead Zone Overlay:**
-   - สุ่มจับ 25 คีย์เฟรมแบบ $5 \times 5$
+   - สุ่มจับ 25 คีย์เฟรมแบบ $5 \times 5$ (`contact_sheet_<video>.png`)
    - สำหรับคลิป 9:16 สคริปต์จะฝังเลเยอร์ Dead Zone Overlay สีแดง (ขวา 140px, ล่าง 320px, บน 180px) ลงในทุกช่องของ Contact Sheet โดยอัตโนมัติ
 
 ---
 
-## 3. Pass/Fail Validation Matrix
+## 3. 16-Point Pass/Fail Validation Matrix
 
-| ลำดับ | มิติการตรวจสอบ (Dimension) | เป้าหมายที่ตรวจสอบ (Inspection Target) | เกณฑ์ผ่านการทดสอบ (Pass Condition) |
+| ลำดับ | มิติการตรวจสอบ (16-Point Check) | เป้าหมายที่ตรวจสอบ (Inspection Target) | เกณฑ์ผ่านการทดสอบ (Pass Condition) |
 | :---: | :--- | :--- | :--- |
-| **1** | **Character Anatomy** | สัดส่วนหัว ตัว คอ แขน ขา | สัดส่วน $1:6.5$; ความยาวคอ $\le 14\text{px}$; มีกล้ามเนื้อ Trapezius ลาดเอียงสมูท |
-| **2** | **Load Ergonomics** | ท่าทางยกและหิ้วของหนัก | กระดูกสันหลังเอียงไปข้างหน้า $15^\circ$–$20^\circ$; สองมือโอบอุ้มวัตถุ; เข่าย่อรับน้ำหนัก |
-| **3** | **Object Fidelity** | กระสอบป่าน, แพชูชีพ, ไฟฉาย | เส้นโค้ง Bezier แบบอินทรีย์, ลวดลายตะเข็บเย็บ, ไม่ใช้รูปทรงเรขาคณิตดิบ |
-| **4** | **Light Alignment** | ลำแสงไฟฉาย | โคนแสงต้องเริ่มจากหน้ากระจกโคมไฟฉายพอดี ($0\text{px}$ offset, ไม่มีแสงลอยเคว้ง) |
-| **5** | **Audio Loudness** | EBU R128 Integrated Loudness | $-18.0 \pm 1.5\text{ LUFS}$ |
-| **6** | **Audio Headroom** | True Peak | $\le -1.0\text{ dBTP}$ |
-| **7** | **Video Encoding** | Resolution & Codec | H.264, yuv420p, 24/30 FPS deterministic |
-| **8** | **Visual Defects** | Black / Freeze frames | 0 unintended frames |
-| **9** | **Hand-Socket & Prop Grip** | จุดยึดมือและวัตถุ (`carry_bag`, `mop`) | ระยะห่างศูนย์กลางฝ่ามือกับวัตถุ $\le 2\text{–}3\text{px}$; เลเยอร์ $\text{Back Arm} < \text{Prop} < \text{Front Arm}$ |
-| **10** | **2-Segment FK Walk** | ท่าเดิน 2 ท่อน และการวางเท้า | มุมพับเข่า $\text{kneeAngle} \ge 0$ (ไม่บิดไปข้างหน้าแบบนกฟลามิงโก); เท้าแตะพื้นกระเบื้อง $0\text{px}$ clipping; ไม่มูนวอล์ก |
-| **11** | **Macro Masking QA** | โคลสอัพมือแปะเทป/เขียนปากกา | `ctx.clip()` ขยายตัวตามหัวปากกา/เทป ($\Delta \le 2\text{–}3\text{px}$); ไม่มีหมึกหรือเทปลอยขึ้นมาก่อน |
-| **12** | **HUD Typography** | สระบน-ล่างภาษาไทย และขอบการ์ด | ความสูง Badge $\ge 24\text{px}$; Padding ในการ์ด $\ge 12\text{px}$; Contrast Ratio $\ge 4.5:1$ (AAA บนการ์ดครีม) |
-| **13** | **9:16 Shorts Safe Zone** | ขอบเขตปลอดภัย Shorts/TikTok | เว้นขอบขวา $140\text{px}$, ขอบล่าง $320\text{px}$, ขอบบน $180\text{px}$; ซับไตเติลและ HUD ไม่โดน UI แอปบัง |
+| **1** | **Video Stream Present** | สตรีมวิดีโอในไฟล์ | พบ Video Codec ที่ถูกต้อง (เช่น `h264`) |
+| **2** | **Audio Stream Present** | สตรีมเสียงในไฟล์ | พบ Audio Codec ที่ถูกต้อง (เช่น `aac`, `44.1/48 kHz`) |
+| **3** | **Frame Rate Determinism** | อัตราเฟรมเรตคงที่ | `24` หรือ `30` FPS แบบ Deterministic |
+| **4** | **Pixel Format Standard** | รูปแบบพิกเซล | `yuv420p` เพื่อความเข้ากันได้ทุกแพลตฟอร์ม |
+| **5** | **Audio Integrated Loudness** | ความดังเสียงมาตรฐาน EBU R128 | 16:9: `-18.0 ± 2.5 LUFS` / 9:16 Shorts: `-14.0..-18.0 LUFS` (`-12.5` ถึง `-19.5 LUFS`) |
+| **6** | **True Peak Headroom** | ระดับยอดคลื่นเสียงสูงสุด | $\le -1.0\text{ dBTP}$ |
+| **7** | **Zero Stale Black Intervals** | เฟรมดำค้างโดยไม่ตั้งใจ | `0` ช่วงเฟรมดำ (`blackdetect=d=0.25:pix_th=0.10`) |
+| **8** | **Character Proportions & Posture** | สัดส่วนหัว ตัว คอ แขน ขา และรองเท้า | สัดส่วน $1:6.5$; คอลาดเอียงเชื่อมไหล่ Trapezius; มีข้อต่อและรองเท้า |
+| **9** | **Weight-Bearing Ergonomics** | ท่าทางยกและหิ้วของหนัก | กระดูกสันหลังโน้มรับน้ำหนัก (`lean` / `poseKneel`) และมือประคองวัตถุ |
+| **10** | **Scene Object Semantic Fidelity** | ความสมจริงของวัตถุและอุปกรณ์ | มีการแรเงาทรงกระบอก `cyl()` และโมเดลอุปกรณ์/ตัวละคร ไม่ใช้กล่องเรขาคณิตดิบ |
+| **11** | **Strict Light-to-Emitter Coincidence** | จุดกำเนิดลำแสงไฟฉาย | โคนแสงเริ่มจากหน้าโคมไฟฉายพอดี ไม่มี `drawFlashlightCone` ลอยแยก |
+| **12** | **Hand-Socket & Prop Grip Alignment** | จุดยึดมือและลำดับเลเยอร์ (`Z-Index`) | ระยะยึดวัตถุชิดฝ่ามือ ($\le 3\text{–}4\text{px}$) และวาด $\text{Far Arm} < \text{Prop} < \text{Near Arm}$ |
+| **13** | **2-Segment FK Walk & Foot-Planting** | ท่าเดิน 2 ท่อน และการวางเท้า | มุมเข่า `Math.max(0, ...)` ไม่บิดไปหน้า; มีพื้นรองเท้าและเงาแตะพื้น; สัมพันธ์กับความเร็วเดิน |
+| **14** | **Macro POV Hand & Progressive Masking** | โคลสอัพมือแปะเทป/เขียนปากกา | ใช้ `ctx.clip()` ผูกกับพิกัดหัวปากกา/เทป (`clamp`/`prog`/`reveal`) ไม่มีเส้นลอยก่อน |
+| **15** | **HUD Typography & Thai Overflow** | สระบน-ล่างภาษาไทย และขอบการ์ด | ความสูง Badge $\ge 24\text{px}$; Padding $\ge 12\text{px}$; Contrast Ratio ผ่านเกณฑ์ WCAG |
+| **16** | **9:16 Shorts Safe Zone & Duration** | ขอบเขตปลอดภัยและความยาวคลิป Shorts | ความยาว $\le 60.0\text{s}$; เว้นขอบขวา $140\text{px}$, ล่าง $320\text{px}$, บน $180\text{px}$ |

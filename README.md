@@ -97,13 +97,13 @@ git clone https://github.com/far1chris/skill-video-inspector.git "$HOME\.gemini\
 Run the inspection tool against any rendered video file:
 
 ```bash
-node scripts/inspect_video.js <path-to-video.mp4>
+node scripts/inspect_video.js <path-to-video.mp4> --strict
 ```
 
-For vertical 9:16 Shorts/Reels/TikTok deliverables:
+For vertical 9:16 Shorts/Reels/TikTok deliverables (`<= 60.0s`, `-14..-18 LUFS`):
 
 ```bash
-node scripts/inspect_video.js <path-to-shorts.mp4> --shorts
+node scripts/inspect_video.js <path-to-shorts.mp4> --shorts --strict
 ```
 
 ---
@@ -127,10 +127,10 @@ node scripts/inspect_video.js <path-to-shorts.mp4> --shorts
    ✅ PASS | Hand-Socket & Prop Grip Alignment (<= 2-3px, Z-index)
    ✅ PASS | 2-Segment FK Walk & Foot-Planting (Knee >= 0, 0px Clip)
    ✅ PASS | Macro POV Hand & Progressive Masking (ctx.clip() sync)
-   ✅ PASS | HUD Typography & Thai Overflow (Accents, Padding >= 12px)
-   ✅ PASS | 9:16 Shorts / TikTok UI Safe Zone (Right 140px, Bottom 320px)
+   ✅ PASS | HUD Typography & Thai Overflow (Badge >= 24px, Pad >= 12px)
+   ✅ PASS | 9:16 Shorts Safe Zone & Duration (<= 60s, Right 140px, Bottom 320px)
 
-Overall QA Status: 🎉 100% PRODUCTION READY & COMPLIANT
+Score: 16/16 PASS — 🎉 100% PRODUCTION READY & COMPLIANT
 =================================================================
 ```
 
