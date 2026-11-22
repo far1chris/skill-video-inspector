@@ -512,6 +512,15 @@ function inspectVideo(videoPath, options = {}) {
           horrorClutterIssues.push('episode.js contains forbidden infographic hud/card property');
         }
       }
+      if (viewsCode) {
+        const activeViewsLines = viewsCode.split(/\r?\n/).filter(l => !/^\s*(?:\/\/|\*)/.test(l)).join('\n');
+        const hasMarkerHand = /\bhand\s*\([^;]{0,220}\bmarker\s*:/.test(activeViewsLines);
+        const hasDashedArrow = /\.setLineDash\s*\(/.test(activeViewsLines);
+        if (hasMarkerHand && hasDashedArrow) {
+          horrorCleanVisualsPass = false;
+          horrorClutterIssues.push('views.js contains disguised marker-arrow lecture board (hand marker + setLineDash)');
+        }
+      }
       if (!horrorCleanVisualsPass) hudCardPaddingPass = false;
       console.log(`   - Clean Horror Video (No HUD/บทนำ): ${horrorCleanVisualsPass ? '✅ VERIFIED (Zero infographics/telemetry/red chapter pills)' : `❌ FAIL (${horrorClutterIssues.join('; ')})`}`);
     }
@@ -597,7 +606,9 @@ function inspectVideo(videoPath, options = {}) {
   }
 
   if (viewsCode && scenesList.length >= 3) {
-    const stageRe = /\b(corridor|streetCafeStage|officeStage|roomInteriorStage|outdoorStage|roomCorner|topDownRoom)\s*\(([^;]{0,120})/;
+    const stageRe = /\b(corridor|streetCafeStage|officeStage|roomInteriorStage|outdoorStage|roomCorner|topDownRoom|drawStiltHouse|drawSugarPalm|drawBananaCluster|drawRiceClump|drawJungleBackdrop|drawBambooGrove)\s*\(([^;]{0,120})/;
+    const rigRe = /\bcameraRig\s*\(([^;]{0,140})/;
+    const horizonRe = /\bhorizonY\s*:\s*(\d+)/;
     const extractViewStage = (viewName) => {
       if (!viewName) return null;
       const esc = viewName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -605,7 +616,13 @@ function inspectVideo(videoPath, options = {}) {
       if (idx === -1) return null;
       const snippet = viewsCode.slice(idx, idx + 900);
       const m = snippet.match(stageRe);
-      return m ? `${m[1]}(${m[2].replace(/\s+/g, ' ').trim()})` : null;
+      const rig = snippet.match(rigRe);
+      const hy = snippet.match(horizonRe);
+      if (!m && !rig) return null;
+      const stagePart = m ? `${m[1]}(${m[2].replace(/\s+/g, ' ').trim()})` : 'customStage';
+      const rigPart = rig ? rig[1].replace(/\s+/g, ' ').trim() : '';
+      const hyPart = hy ? `hy:${hy[1]}` : '';
+      return `${stagePart}|${hyPart}|${rigPart}`;
     };
     let streak = 1;
     let prevSig = null;
